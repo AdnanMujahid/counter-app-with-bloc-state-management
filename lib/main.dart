@@ -1,12 +1,14 @@
 import 'package:counterapp/Bloc/counter_bloc.dart';
-import 'package:counterapp/Bloc/counter_event.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'Bloc/counter_state.dart';
-
 void main() {
-  runApp(const MyApp());
+  runApp(
+    BlocProvider(
+      create: (_)=> CounterBloc(),
+      child: const MyApp(),
+    )
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -20,10 +22,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: .fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: BlocProvider(
-        create: (_)=> CounterBloc(),
-        child: const MyHomePage(title: 'Flutter Bloc Demo'),
-      ),
+      home: const MyHomePage(title: 'Flutter Bloc Demo'),
     );
   }
 }
@@ -44,21 +43,20 @@ class MyHomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Bloc = BlocProvider.of<CounterBloc>(context);
+    final Bloc = context.read<CounterBloc>();
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-
         title: Text(title),
       ),
       body: Center(
 
-        child: BlocBuilder<CounterBloc, CounterState>(
-          builder: (context, state) {
+        child: BlocBuilder<CounterBloc, int>(
+          builder: (context, count) {
             return Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                Text('${state.counter}'),
+                Text('$count'),
               ],
             );
           },
@@ -68,14 +66,14 @@ class MyHomePage extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           FloatingActionButton(
-            onPressed: ()=> Bloc.add(increment()),
+            onPressed: ()=> Bloc.increment(),
             tooltip: 'Increment',
             child: const Icon(Icons.add),
           ),
           FloatingActionButton(
-            onPressed: ()=> Bloc.add(decrement()),
+            onPressed: ()=> Bloc.decrement(),
             tooltip: 'Decrement',
-            child: const Icon(Icons.add),
+            child: const Icon(Icons.remove),
           ),
         ],
       ),
