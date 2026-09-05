@@ -5,7 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 void main() {
   runApp(
     BlocProvider(
-      create: (_)=> CounterBloc(),
+      create: (_)=> CounterQubit(),
       child: const MyApp(),
     )
   );
@@ -43,7 +43,7 @@ class MyHomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Bloc = context.read<CounterBloc>();
+    final Qubit = context.read<CounterQubit>();
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -51,7 +51,7 @@ class MyHomePage extends StatelessWidget {
       ),
       body: Center(
 
-        child: BlocBuilder<CounterBloc, int>(
+        child: BlocBuilder<CounterQubit, int>(
           builder: (context, count) {
             return Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -66,12 +66,12 @@ class MyHomePage extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           FloatingActionButton(
-            onPressed: ()=> Bloc.increment(),
+            onPressed: ()=> Qubit.increment(),
             tooltip: 'Increment',
             child: const Icon(Icons.add),
           ),
           FloatingActionButton(
-            onPressed: ()=> Bloc.decrement(),
+            onPressed: ()=> Qubit.decrement(),
             tooltip: 'Decrement',
             child: const Icon(Icons.remove),
           ),
