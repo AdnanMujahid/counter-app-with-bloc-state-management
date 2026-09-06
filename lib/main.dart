@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:themechange/bloc/CounterCubit.dart';
 import 'package:themechange/bloc/themeCubit.dart';
 
 void main() {
-  runApp(BlocProvider(
-    create: (_) => ThemeCubit(),
+  runApp(MultiBlocProvider(
+    providers: [
+      BlocProvider(
+          create: (_) => ThemeCubit(),
+      ),
+      BlocProvider(
+        create: (_) => CounterQubit(),
+      ),
+    ],
     child: MyApp(),
   ));
 }
@@ -46,55 +54,78 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
    final themeCubit = context.read<ThemeCubit>();
-    return Scaffold(
-      appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
+   final counterCubit = context.read<CounterQubit>();
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<CounterQubit, int>(
+            listener: (context, state){
+              if(state == 5 || state == 10){
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("The Counter is at ${State}")));
+              }
+            }
+            ),
+        BlocListener<ThemeCubit, ThemeData>(
+            listener: (context, state){
+              if(state == ThemeData.light()){
+                ScaffoldMessenger.of(context)
+                    .showSnackBar(
+                    SnackBar(
+                        content: Text("The Theme changes to Light")));
+              }
+              else{
+                ScaffoldMessenger.of(context)
+                    .showSnackBar(
+                    SnackBar(
+                        content: Text("The Theme changes to Dark")));
+              }
+            }
+        ),
+      ],
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+          title: Text(widget.title),
+        ),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: .center,
+            children: [
+              ElevatedButton(
+                  onPressed: (){
+                    themeCubit.toogleTheme();
+                  },
+                  child: Text('Change Theme')),
+              const Text('You have pushed the button this many times:'),
+              BlocBuilder<CounterQubit, int>(
+                  builder: (context, count){
+                    return Text(
+                      '$count',
+                      style: Theme.of(context).textTheme.headlineMedium,
+                    );
+                  }
+              ),
+            ],
+          ),
+        ),
+        floatingActionButton: Column(
           mainAxisAlignment: .center,
           children: [
-            ElevatedButton(
-                onPressed: (){
-                  themeCubit.toogleTheme();
-                },
-                child: Text('Change Theme')),
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+            FloatingActionButton(
+              onPressed: counterCubit.increment,
+              tooltip: 'Increment',
+              child: const Icon(Icons.add),
+            ),
+            FloatingActionButton(
+              onPressed: counterCubit.decrement,
+              tooltip: 'Decrement',
+              child: const Icon(Icons.remove),
             ),
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
       ),
     );
   }
